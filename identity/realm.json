@@ -1,0 +1,72 @@
+{
+  "realm": "company-owned-cloud",
+  "displayName": "Company-Owned Cloud Lab",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "resetPasswordAllowed": false,
+  "rememberMe": false,
+  "loginWithEmailAllowed": false,
+  "bruteForceProtected": true,
+  "failureFactor": 5,
+  "waitIncrementSeconds": 30,
+  "maxFailureWaitSeconds": 900,
+  "otpPolicyType": "totp",
+  "otpPolicyAlgorithm": "HmacSHA256",
+  "otpPolicyDigits": 6,
+  "otpPolicyPeriod": 30,
+  "roles": {
+    "realm": [
+      {"name": "cloud-user", "description": "May use the synthetic notes service"},
+      {"name": "cloud-admin", "description": "May inspect content-minimised audit summaries"}
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "portable-notes",
+      "name": "Portable notes demonstrator",
+      "enabled": true,
+      "publicClient": true,
+      "directAccessGrantsEnabled": true,
+      "standardFlowEnabled": true,
+      "redirectUris": ["http://127.0.0.1:18780/*", "http://127.0.0.1:18781/*"],
+      "webOrigins": ["http://127.0.0.1:18780", "http://127.0.0.1:18781"],
+      "protocol": "openid-connect",
+      "protocolMappers": [
+        {
+          "name": "portable-notes-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "portable-notes",
+            "id.token.claim": "false",
+            "access.token.claim": "true"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "wrong-audience",
+      "name": "Negative-test audience",
+      "enabled": true,
+      "publicClient": true,
+      "directAccessGrantsEnabled": true,
+      "standardFlowEnabled": false,
+      "protocol": "openid-connect",
+      "protocolMappers": [
+        {
+          "name": "wrong-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "wrong-audience",
+            "id.token.claim": "false",
+            "access.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ]
+}

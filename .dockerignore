@@ -1,0 +1,9 @@
+.git
+.gitignore
+runtime
+outputs
+evidence
+handoffs
+.cognitive-memory
+__pycache__
+*.pyc

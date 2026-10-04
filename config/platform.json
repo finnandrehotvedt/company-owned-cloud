@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "project": "company-owned-cloud-lab",
+  "classification": "small_synthetic_demo",
+  "ports": {
+    "target_a": 18780,
+    "target_b": 18781,
+    "database_a": 18782,
+    "database_b": 18783,
+    "identity": 18790,
+    "bind": "127.0.0.1"
+  },
+  "limits": {
+    "aggregate_cpus": 1.8,
+    "aggregate_memory_mib": 1792,
+    "new_disk_mib": 2560,
+    "minimum_host_free_disk_mib": 4096
+  },
+  "data": {
+    "synthetic_only": true,
+    "customer_data_allowed": false
+  },
+  "claims": {
+    "enterprise_ready": false,
+    "production_sla": false,
+    "identity_exit_measured": false,
+    "application_data_exit_measured": true
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["schema_version", "project", "classification", "ports", "limits", "data", "claims"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": 1},
+    "project": {"const": "company-owned-cloud-lab"},
+    "classification": {"const": "small_synthetic_demo"},
+    "ports": {
+      "type": "object",
+      "required": ["target_a", "target_b", "database_a", "database_b", "identity", "bind"],
+      "additionalProperties": false,
+      "properties": {
+        "target_a": {"const": 18780},
+        "target_b": {"const": 18781},
+        "database_a": {"const": 18782},
+        "database_b": {"const": 18783},
+        "identity": {"const": 18790},
+        "bind": {"const": "127.0.0.1"}
+      }
+    },
+    "limits": {
+      "type": "object",
+      "required": ["aggregate_cpus", "aggregate_memory_mib", "new_disk_mib", "minimum_host_free_disk_mib"],
+      "properties": {
+        "aggregate_cpus": {"type": "number", "maximum": 2.0},
+        "aggregate_memory_mib": {"type": "integer", "maximum": 2048},
+        "new_disk_mib": {"type": "integer", "maximum": 2560},
+        "minimum_host_free_disk_mib": {"type": "integer", "minimum": 4096}
+      }
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "synthetic_only": {"const": true},
+        "customer_data_allowed": {"const": false}
+      }
+    },
+    "claims": {
+      "type": "object",
+      "properties": {
+        "enterprise_ready": {"const": false},
+        "production_sla": {"const": false},
+        "identity_exit_measured": {"const": false},
+        "application_data_exit_measured": {"const": true}
+      }
+    }
+  }
+}

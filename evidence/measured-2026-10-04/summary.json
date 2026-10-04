@@ -1,0 +1,32 @@
+{
+  "application_data_exit_elapsed_seconds": 24.843,
+  "application_data_exit_passed": true,
+  "authorization_checks": {
+    "admin_role_accepted": true,
+    "admin_token_issued": true,
+    "audit_content_minimised": true,
+    "health": true,
+    "insufficient_role_rejected": true,
+    "mfa_enrolment_required": true,
+    "missing_token_rejected": true,
+    "notes_read": true,
+    "state_available": true,
+    "user_token_issued": true,
+    "valid_user_accepted": true,
+    "wrong_audience_rejected": true,
+    "wrong_audience_token_issued": true
+  },
+  "backup_elapsed_seconds": 6.457,
+  "classification": "small_synthetic_demo",
+  "content_sha256": "1c6742735fb805218b18b8757543e72e7fb7e9ec04f561f3c0ab2062af8725ee",
+  "enterprise_or_production_claim": false,
+  "final_runtime_state": "stopped",
+  "identity_exit_measured": false,
+  "measured_on": "intentforce-ct109",
+  "passed": true,
+  "persistence_passed": true,
+  "physical_access_hardware_tested": false,
+  "record_count": 2,
+  "sampled_peak_memory_bytes": 697502266,
+  "schema_version": 1
+}

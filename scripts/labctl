@@ -1,0 +1,185 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+cd "$ROOT"
+export COMPOSE_PROJECT_NAME=company-owned-cloud-lab
+COMPOSE=(docker-compose -f compose.yaml)
+EVIDENCE="$ROOT/runtime/evidence"
+
+usage() {
+  printf '%s\n' "Usage: scripts/labctl {init|validate|start-a|test-a|persistence|backup|exit-test|integration|status|stop|reset}"
+}
+
+guard_disk() {
+  local free_mib
+  free_mib=$(df -Pm "$ROOT" | awk 'NR==2 {print $4}')
+  if (( free_mib < 4096 )); then
+    echo "Refusing build/run: only ${free_mib} MiB free; contract requires at least 4096 MiB." >&2
+    exit 75
+  fi
+}
+
+wait_url() {
+  local url=$1
+  local label=$2
+  for _ in $(seq 1 90); do
+    if curl --fail --silent --show-error --max-time 3 "$url" >/dev/null 2>&1; then
+      echo "$label is ready."
+      return 0
+    fi
+    sleep 2
+  done
+  echo "$label did not become ready: $url" >&2
+  return 1
+}
+
+wait_healthy() {
+  local service=$1
+  local id state
+  for _ in $(seq 1 60); do
+    id=$("${COMPOSE[@]}" ps -q "$service")
+    if [[ -n "$id" ]]; then
+      state=$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' "$id")
+      if [[ "$state" == healthy ]]; then
+        echo "$service is healthy."
+        return 0
+      fi
+    fi
+    sleep 2
+  done
+  echo "$service did not become healthy" >&2
+  return 1
+}
+
+assert_stopped() {
+  local service=$1
+  local id running
+  id=$("${COMPOSE[@]}" ps -q "$service" 2>/dev/null || true)
+  if [[ -n "$id" ]]; then
+    running=$(docker inspect --format '{{.State.Running}}' "$id")
+    [[ "$running" == false ]] || { echo "$service is unexpectedly running" >&2; return 1; }
+  fi
+}
+
+initialise() {
+  python3 scripts/init_runtime.py
+  mkdir -p "$EVIDENCE"
+}
+
+validate() {
+  initialise
+  python3 scripts/validate_config.py
+  "${COMPOSE[@]}" config --quiet
+  python3 -m unittest discover -s tests -v
+}
+
+start_a() {
+  guard_disk
+  initialise
+  "${COMPOSE[@]}" build app-a
+  "${COMPOSE[@]}" up -d identity db-a
+  wait_url "http://127.0.0.1:18790/realms/company-owned-cloud" "identity"
+  python3 scripts/bootstrap_identity.py
+  wait_healthy db-a
+  "${COMPOSE[@]}" up -d app-a
+  wait_url "http://127.0.0.1:18780/readyz" "target A"
+}
+
+test_a() {
+  python3 scripts/acceptance.py --base http://127.0.0.1:18780 --target target-a --seed --output "$EVIDENCE/target-a.json"
+}
+
+persistence() {
+  python3 scripts/acceptance.py --base http://127.0.0.1:18780 --target target-a --output "$EVIDENCE/persistence-before.json" >/dev/null
+  "${COMPOSE[@]}" stop app-a db-a
+  "${COMPOSE[@]}" up -d db-a
+  wait_healthy db-a
+  "${COMPOSE[@]}" up -d app-a
+  wait_url "http://127.0.0.1:18780/readyz" "target A after restart"
+  python3 scripts/acceptance.py --base http://127.0.0.1:18780 --target target-a --output "$EVIDENCE/persistence-after.json" >/dev/null
+  python3 scripts/compare_states.py "$EVIDENCE/persistence-before.json" "$EVIDENCE/persistence-after.json" "$EVIDENCE/persistence.json"
+}
+
+backup() {
+  local started ended
+  started=$(date +%s%3N)
+  "${COMPOSE[@]}" run --rm exporter
+  "${COMPOSE[@]}" run --rm backup >"$EVIDENCE/restic-snapshot.json"
+  ended=$(date +%s%3N)
+  python3 scripts/write_timing.py backup "$started" "$ended" "$EVIDENCE/backup-timing.json"
+}
+
+exit_test() {
+  local started ended
+  python3 scripts/acceptance.py --base http://127.0.0.1:18780 --target target-a --output "$EVIDENCE/exit-source.json" >/dev/null
+  started=$(date +%s%3N)
+  backup
+  "${COMPOSE[@]}" stop app-a db-a
+  assert_stopped app-a
+  assert_stopped db-a
+  "${COMPOSE[@]}" stop app-b db-b >/dev/null 2>&1 || true
+  "${COMPOSE[@]}" up -d db-b
+  wait_healthy db-b
+  "${COMPOSE[@]}" run --rm restore >"$EVIDENCE/restic-restore.log"
+  "${COMPOSE[@]}" run --rm importer
+  "${COMPOSE[@]}" up -d app-b
+  wait_url "http://127.0.0.1:18781/readyz" "target B"
+  python3 scripts/acceptance.py --base http://127.0.0.1:18781 --target target-b --output "$EVIDENCE/exit-target.json" >/dev/null
+  python3 scripts/compare_states.py "$EVIDENCE/exit-source.json" "$EVIDENCE/exit-target.json" "$EVIDENCE/exit-comparison.json"
+  ended=$(date +%s%3N)
+  python3 scripts/write_timing.py application-data-exit "$started" "$ended" "$EVIDENCE/exit-timing.json"
+  assert_stopped app-a
+  assert_stopped db-a
+}
+
+integration() {
+  validate
+  "${COMPOSE[@]}" down --remove-orphans >/dev/null 2>&1 || true
+  rm -f runtime/monitor.stop
+  python3 scripts/monitor_resources.py --project "$COMPOSE_PROJECT_NAME" --stop-file runtime/monitor.stop --output "$EVIDENCE/resource-peak.json" &
+  local monitor_pid=$!
+  trap 'python3 -c "from pathlib import Path; Path(\"runtime/monitor.stop\").touch()"; wait '"$monitor_pid"' 2>/dev/null || true; "${COMPOSE[@]}" down --remove-orphans >/dev/null 2>&1 || true' EXIT
+  start_a
+  test_a
+  persistence
+  exit_test
+  python3 -c 'from pathlib import Path; Path("runtime/monitor.stop").touch()'
+  wait "$monitor_pid"
+  trap - EXIT
+  "${COMPOSE[@]}" down --remove-orphans
+  python3 scripts/finalise_evidence.py
+  echo "Integration and measured target exit passed; lab is stopped."
+}
+
+status() {
+  initialise
+  "${COMPOSE[@]}" ps
+  ss -ltn | awk '$4 ~ /127.0.0.1:187(80|81|90)$/ {print}'
+}
+
+stop_lab() {
+  "${COMPOSE[@]}" down --remove-orphans
+  echo "Lab stopped; named volumes retained."
+}
+
+reset_lab() {
+  echo "Removing only company-owned-cloud-lab containers, networks and named volumes."
+  "${COMPOSE[@]}" down --volumes --remove-orphans
+  echo "Lab runtime volumes removed. Generated secret files were retained."
+}
+
+case "${1:-}" in
+  init) initialise ;;
+  validate) validate ;;
+  start-a) start_a ;;
+  test-a) test_a ;;
+  persistence) persistence ;;
+  backup) backup ;;
+  exit-test) exit_test ;;
+  integration) integration ;;
+  status) status ;;
+  stop) stop_lab ;;
+  reset) reset_lab ;;
+  *) usage; exit 64 ;;
+esac

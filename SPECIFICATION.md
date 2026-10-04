@@ -51,7 +51,14 @@ Reserved loopback ports:
 
 - `127.0.0.1:18780` — target A application;
 - `127.0.0.1:18781` — target B application;
+- `127.0.0.1:18782` — target A PostgreSQL;
+- `127.0.0.1:18783` — target B PostgreSQL;
 - `127.0.0.1:18790` — Keycloak lab identity.
+
+CT109 uses explicit host-loopback networking for these processes because its
+existing Docker bridge pool/forwarding state cannot carry traffic on a newly
+created project bridge without shared firewall changes. This is an observed
+host compatibility choice, not a general recommendation.
 
 No automatic restart policy is allowed. The final resting state is stopped.
 

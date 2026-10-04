@@ -1,0 +1,12 @@
+runtime/
+.env
+.env.runtime
+__pycache__/
+*.py[cod]
+.pytest_cache/
+dist/
+build/
+evidence/runtime-private/
+evidence/browser/*.png
+outputs/release/*.tar.gz
+outputs/release/*.sha256

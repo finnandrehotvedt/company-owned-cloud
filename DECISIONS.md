@@ -20,3 +20,20 @@ MFA re-enrolment remain explicit unmeasured limitations.
 The public websites present source, evidence, screenshots and honest limits.
 The lab itself stays loopback-only and stopped after testing, avoiding a new
 public attack surface or ongoing resource cost.
+
+## D4 — Physical credentials are future options only
+
+RFID, smart cards, fingerprint readers and similar physical-access hardware
+are not purchased, integrated or tested in this release. They may be mentioned
+as examples of later, separately assessed upgrades. No current security or
+portability claim depends on them.
+
+## D5 — Explicit host-loopback networking on CT109
+
+CT109's exhausted default Docker address pool and existing bridge forwarding
+state made a newly created demo bridge non-functional without changing shared
+host firewall rules. The lab therefore uses host networking with every
+listening process explicitly bound to `127.0.0.1` on reserved unique ports.
+No wildcard or public listener is accepted. Target A and B still have separate
+application ports, database ports and persistent volumes, and the measured
+exit stops A before B is accepted.

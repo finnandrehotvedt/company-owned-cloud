@@ -1,0 +1,14 @@
+{
+  "after": {
+    "content_sha256": "1c6742735fb805218b18b8757543e72e7fb7e9ec04f561f3c0ab2062af8725ee",
+    "record_count": 2
+  },
+  "before": {
+    "content_sha256": "1c6742735fb805218b18b8757543e72e7fb7e9ec04f561f3c0ab2062af8725ee",
+    "record_count": 2
+  },
+  "content_sha256_equal": true,
+  "passed": true,
+  "record_count_equal": true,
+  "schema_version": 1
+}

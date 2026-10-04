@@ -1,0 +1,15 @@
+{
+  "peak_memory_bytes_aggregate": 697502266,
+  "peak_memory_bytes_by_container": {
+    "company-owned-cloud-lab_app-a_1": 47416606,
+    "company-owned-cloud-lab_app-b_1": 45602570,
+    "company-owned-cloud-lab_backup_run_d526d2bfa59b": 40422604,
+    "company-owned-cloud-lab_db-a_1": 24096276,
+    "company-owned-cloud-lab_db-b_1": 21023948,
+    "company-owned-cloud-lab_identity_1": 518940262,
+    "company-owned-cloud-lab_restore_run_8751916e37bf": 0
+  },
+  "sample_count": 46,
+  "sampling_interval_seconds": 1,
+  "schema_version": 1
+}

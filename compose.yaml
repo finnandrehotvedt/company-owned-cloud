@@ -1,0 +1,259 @@
+version: "2.4"
+
+x-postgres-base: &postgres-base
+  image: postgres:17.6-bookworm@sha256:f3bd19c606e442c3d7bdfa8002e03fe260a1023351e0ea4598032022b68dd6e3
+  environment:
+    POSTGRES_DB: cloudlab
+    POSTGRES_USER: cloudlab
+  healthcheck:
+    test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -p $${PGPORT} -U cloudlab -d cloudlab"]
+    interval: 3s
+    timeout: 3s
+    retries: 25
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+  cap_add:
+    - CHOWN
+    - DAC_OVERRIDE
+    - FOWNER
+    - SETGID
+    - SETUID
+  mem_limit: 256m
+  cpus: 0.30
+  restart: "no"
+
+x-app-base: &app-base
+  build:
+    context: .
+    dockerfile: app/Dockerfile
+    network: host
+  environment:
+    DATABASE_PORT: "5432"
+    DATABASE_NAME: cloudlab
+    DATABASE_USER: cloudlab
+    DATABASE_PASSWORD_FILE: /run/secrets/database_password
+    OIDC_ISSUER: http://127.0.0.1:18790/realms/company-owned-cloud
+    OIDC_JWKS_URL: http://identity:8080/realms/company-owned-cloud/protocol/openid-connect/certs
+    OIDC_AUDIENCE: portable-notes
+    AUDIT_LOG_PATH: /var/log/company-owned-cloud/audit.jsonl
+  read_only: true
+  tmpfs:
+    - /tmp:rw,noexec,nosuid,size=16m
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+  mem_limit: 192m
+  cpus: 0.25
+  restart: "no"
+
+services:
+  identity:
+    image: quay.io/keycloak/keycloak:26.3.3@sha256:6a7217a100bd3e5de4063a27a538ef999a3c5a88c4b4ec0ffc0a642aee7b2597
+    entrypoint: ["/opt/lab/entrypoint.sh"]
+    command: ["start-dev", "--import-realm", "--http-host=127.0.0.1", "--http-port=18790"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: lab-admin
+      KEYCLOAK_ADMIN_PASSWORD_FILE: /run/secrets/keycloak_admin_password
+      KC_HEALTH_ENABLED: "true"
+      KC_HTTP_ENABLED: "true"
+      KC_HOSTNAME: http://127.0.0.1:18790
+      KC_HOSTNAME_STRICT: "false"
+    secrets:
+      - keycloak_admin_password
+    volumes:
+      - identity_data:/opt/keycloak/data
+      - ./identity/realm.json:/opt/keycloak/data/import/realm.json:ro
+      - ./identity/entrypoint.sh:/opt/lab/entrypoint.sh:ro
+    network_mode: host
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000 && printf 'GET /health/ready HTTP/1.0\r\n\r\n' >&3 && grep -q '200 OK' <&3"]
+      interval: 5s
+      timeout: 4s
+      retries: 30
+      start_period: 20s
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    mem_limit: 512m
+    cpus: 0.40
+    restart: "no"
+
+  db-a:
+    <<: *postgres-base
+    environment:
+      POSTGRES_DB: cloudlab
+      POSTGRES_USER: cloudlab
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_a_password
+      PGPORT: "18782"
+    secrets:
+      - db_a_password
+    volumes:
+      - db_a_data:/var/lib/postgresql/data
+    command: ["postgres", "-c", "listen_addresses=127.0.0.1", "-p", "18782"]
+    network_mode: host
+
+  app-a:
+    <<: *app-base
+    environment:
+      DATABASE_HOST: 127.0.0.1
+      DATABASE_PORT: "18782"
+      DATABASE_NAME: cloudlab
+      DATABASE_USER: cloudlab
+      DATABASE_PASSWORD_FILE: /run/secrets/database_password
+      OIDC_ISSUER: http://127.0.0.1:18790/realms/company-owned-cloud
+      OIDC_JWKS_URL: http://127.0.0.1:18790/realms/company-owned-cloud/protocol/openid-connect/certs
+      OIDC_AUDIENCE: portable-notes
+      AUDIT_LOG_PATH: /var/log/company-owned-cloud/audit.jsonl
+      DEMO_TARGET: target-a
+    secrets:
+      - source: db_a_password
+        target: database_password
+    volumes:
+      - audit_a:/var/log/company-owned-cloud
+    command: ["uvicorn", "cloud_demo.main:app", "--host", "127.0.0.1", "--port", "18780", "--no-access-log"]
+    network_mode: host
+
+  db-b:
+    <<: *postgres-base
+    environment:
+      POSTGRES_DB: cloudlab
+      POSTGRES_USER: cloudlab
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_b_password
+      PGPORT: "18783"
+    secrets:
+      - db_b_password
+    volumes:
+      - db_b_data:/var/lib/postgresql/data
+    command: ["postgres", "-c", "listen_addresses=127.0.0.1", "-p", "18783"]
+    network_mode: host
+
+  app-b:
+    <<: *app-base
+    environment:
+      DATABASE_HOST: 127.0.0.1
+      DATABASE_PORT: "18783"
+      DATABASE_NAME: cloudlab
+      DATABASE_USER: cloudlab
+      DATABASE_PASSWORD_FILE: /run/secrets/database_password
+      OIDC_ISSUER: http://127.0.0.1:18790/realms/company-owned-cloud
+      OIDC_JWKS_URL: http://127.0.0.1:18790/realms/company-owned-cloud/protocol/openid-connect/certs
+      OIDC_AUDIENCE: portable-notes
+      AUDIT_LOG_PATH: /var/log/company-owned-cloud/audit.jsonl
+      DEMO_TARGET: target-b
+    secrets:
+      - source: db_b_password
+        target: database_password
+    volumes:
+      - audit_b:/var/log/company-owned-cloud
+    command: ["uvicorn", "cloud_demo.main:app", "--host", "127.0.0.1", "--port", "18781", "--no-access-log"]
+    network_mode: host
+
+  exporter:
+    image: postgres:17.6-bookworm@sha256:f3bd19c606e442c3d7bdfa8002e03fe260a1023351e0ea4598032022b68dd6e3
+    entrypoint: ["/scripts/export-source.sh"]
+    environment:
+      PGHOST: 127.0.0.1
+      PGPORT: "18782"
+      PGDATABASE: cloudlab
+      PGUSER: cloudlab
+      DATABASE_PASSWORD_FILE: /run/secrets/db_a_password
+    secrets:
+      - db_a_password
+    volumes:
+      - transfer:/transfer
+      - ./scripts:/scripts:ro
+    network_mode: host
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: ["ALL"]
+    cap_add: ["DAC_OVERRIDE"]
+    mem_limit: 128m
+    cpus: 0.20
+    restart: "no"
+
+  backup:
+    image: restic/restic:0.18.1@sha256:39d9072fb5651c80d75c7a811612eb60b4c06b32ffe87c2e9f3c7222e1797e76
+    entrypoint: ["/scripts/restic-backup.sh"]
+    environment:
+      RESTIC_REPOSITORY: /repo
+      RESTIC_PASSWORD_FILE: /run/secrets/restic_password
+    secrets:
+      - restic_password
+    volumes:
+      - transfer:/transfer:ro
+      - restic_repo:/repo
+      - ./scripts:/scripts:ro
+    network_mode: none
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: ["ALL"]
+    mem_limit: 128m
+    cpus: 0.20
+    restart: "no"
+
+  restore:
+    image: restic/restic:0.18.1@sha256:39d9072fb5651c80d75c7a811612eb60b4c06b32ffe87c2e9f3c7222e1797e76
+    entrypoint: ["/scripts/restic-restore.sh"]
+    environment:
+      RESTIC_REPOSITORY: /repo
+      RESTIC_PASSWORD_FILE: /run/secrets/restic_password
+    secrets:
+      - restic_password
+    volumes:
+      - restored:/restore
+      - restic_repo:/repo
+      - ./scripts:/scripts:ro
+    network_mode: none
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: ["ALL"]
+    mem_limit: 128m
+    cpus: 0.20
+    restart: "no"
+
+  importer:
+    image: postgres:17.6-bookworm@sha256:f3bd19c606e442c3d7bdfa8002e03fe260a1023351e0ea4598032022b68dd6e3
+    entrypoint: ["/scripts/import-target.sh"]
+    environment:
+      PGHOST: 127.0.0.1
+      PGPORT: "18783"
+      PGDATABASE: cloudlab
+      PGUSER: cloudlab
+      DATABASE_PASSWORD_FILE: /run/secrets/db_b_password
+    secrets:
+      - db_b_password
+    volumes:
+      - restored:/restore:ro
+      - ./scripts:/scripts:ro
+    network_mode: host
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: ["ALL"]
+    cap_add: ["DAC_OVERRIDE"]
+    mem_limit: 128m
+    cpus: 0.20
+    restart: "no"
+
+secrets:
+  db_a_password:
+    file: ./runtime/secrets/db_a_password
+  db_b_password:
+    file: ./runtime/secrets/db_b_password
+  keycloak_admin_password:
+    file: ./runtime/secrets/keycloak_admin_password
+  restic_password:
+    file: ./runtime/secrets/restic_password
+
+volumes:
+  identity_data:
+  db_a_data:
+  db_b_data:
+  audit_a:
+  audit_b:
+  transfer:
+  restored:
+  restic_repo:
