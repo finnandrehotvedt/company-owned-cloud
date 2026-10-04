@@ -51,7 +51,9 @@ x-app-base: &app-base
 
 services:
   identity:
-    image: quay.io/keycloak/keycloak:26.3.3@sha256:6a7217a100bd3e5de4063a27a538ef999a3c5a88c4b4ec0ffc0a642aee7b2597
+    build:
+      context: .
+      dockerfile: identity/Dockerfile
     entrypoint: ["/opt/lab/entrypoint.sh"]
     command: ["start-dev", "--import-realm", "--http-host=127.0.0.1", "--http-port=18790"]
     environment:
@@ -65,8 +67,6 @@ services:
       - keycloak_admin_password
     volumes:
       - identity_data:/opt/keycloak/data
-      - ./identity/realm.json:/opt/keycloak/data/import/realm.json:ro
-      - ./identity/entrypoint.sh:/opt/lab/entrypoint.sh:ro
     network_mode: host
     healthcheck:
       test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000 && printf 'GET /health/ready HTTP/1.0\r\n\r\n' >&3 && grep -q '200 OK' <&3"]
@@ -191,6 +191,7 @@ services:
     security_opt:
       - no-new-privileges:true
     cap_drop: ["ALL"]
+    cap_add: ["DAC_OVERRIDE"]
     mem_limit: 128m
     cpus: 0.20
     restart: "no"
@@ -211,6 +212,7 @@ services:
     security_opt:
       - no-new-privileges:true
     cap_drop: ["ALL"]
+    cap_add: ["DAC_OVERRIDE"]
     mem_limit: 128m
     cpus: 0.20
     restart: "no"

@@ -78,7 +78,7 @@ validate() {
 start_a() {
   guard_disk
   initialise
-  "${COMPOSE[@]}" build app-a
+  "${COMPOSE[@]}" build identity app-a
   "${COMPOSE[@]}" up -d identity db-a
   wait_url "http://127.0.0.1:18790/realms/company-owned-cloud" "identity"
   python3 scripts/bootstrap_identity.py
@@ -165,7 +165,7 @@ stop_lab() {
 }
 
 reset_lab() {
-  echo "Removing only company-owned-cloud-lab containers, networks and named volumes."
+  echo "Removing only ${COMPOSE_PROJECT_NAME} containers, networks and named volumes."
   "${COMPOSE[@]}" down --volumes --remove-orphans
   echo "Lab runtime volumes removed. Generated secret files were retained."
 }
