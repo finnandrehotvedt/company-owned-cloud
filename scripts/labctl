@@ -3,7 +3,8 @@ set -Eeuo pipefail
 
 ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 cd "$ROOT"
-export COMPOSE_PROJECT_NAME=company-owned-cloud-lab
+: "${COMPOSE_PROJECT_NAME:=company-owned-cloud-lab}"
+export COMPOSE_PROJECT_NAME
 COMPOSE=(docker-compose -f compose.yaml)
 EVIDENCE="$ROOT/runtime/evidence"
 

@@ -4,12 +4,14 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+COMPOSE_PROJECT = os.environ.get("COMPOSE_PROJECT_NAME", "company-owned-cloud-lab")
 SOURCE = ROOT / "runtime" / "evidence"
 DESTINATION = ROOT / "evidence" / "measured-2026-10-04"
 INPUTS = (
@@ -33,7 +35,7 @@ def main() -> None:
     if missing:
         raise RuntimeError(f"missing evidence inputs: {missing}")
     running = subprocess.run(
-        ["docker", "ps", "-q", "--filter", "label=com.docker.compose.project=company-owned-cloud-lab"],
+        ["docker", "ps", "-q", "--filter", f"label=com.docker.compose.project={COMPOSE_PROJECT}"],
         check=True,
         capture_output=True,
         text=True,

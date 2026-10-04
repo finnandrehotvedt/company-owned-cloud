@@ -18,6 +18,11 @@ A, runs positive and negative authorisation tests, proves persistence, creates
 and checks an encrypted Restic backup, stops A, restores to B, compares count
 and content hash, records resource samples and stops the entire lab.
 
+For an isolated second rehearsal on the same Docker host, set a distinct
+project name, for example
+`COMPOSE_PROJECT_NAME=company-owned-cloud-fresh scripts/labctl integration`.
+The fixed loopback ports must still be free.
+
 ## Smaller lifecycle commands
 
 ```sh
