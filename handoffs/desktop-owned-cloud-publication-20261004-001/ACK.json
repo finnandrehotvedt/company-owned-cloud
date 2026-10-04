@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "receipt_id": "desktop-owned-cloud-publication-20261004-001",
+  "status": "accepted_in_progress",
+  "accepted": true,
+  "sender_station_id": "desktop-etvt6l5",
+  "receiver_station_id": "intentforce-ct109",
+  "receiver_role": "resident-operator",
+  "return_thread_id": "01a1004c-093d-7693-a64e-ed6de5524986",
+  "role_evidence": {
+    "path": "/srv/codex-workspaces/intentforce-station/ROLE-MANIFEST.json",
+    "sha256": "5db857a19048e32158e3874e17afe3b74768903c7baf6b282c9bb22034f697cb"
+  },
+  "effective_execution_context": {
+    "filesystem": "unrestricted",
+    "approval_policy": "never",
+    "contract": "Finn-direct CT109 resident root profile"
+  },
+  "owning_project": "company-owned-cloud",
+  "project_path": "/srv/codex-workspaces/projects/company-owned-cloud",
+  "source_plan_path": "/tmp/desktop-owned-cloud-PLAN-20261004.md",
+  "scope_readback": {
+    "implementation_authorized": true,
+    "size": "small isolated demo on existing owned server capacity",
+    "runtime": "loopback-only reproducible lab with synthetic data",
+    "measured_exit": "one demo application and database from isolated target A to target B",
+    "public_source": "identical GitHub and GitLab main after green evidence",
+    "websites": "bounded IntentForce presentation and Finnandre bilingual proof entry after source publication",
+    "media": "tested-result-based Norwegian and English manuscript plus genuine screenshots/diagrams; Desktop owns narration and heavy rendering"
+  },
+  "resource_basis": {
+    "host_cpus": 10,
+    "host_ram_gib": 12,
+    "host_available_ram_gib": 9,
+    "host_free_disk_gib": 7.3,
+    "lab_cpu_limit": "less than 2 CPUs concurrent",
+    "lab_ram_limit": "less than 2 GiB concurrent",
+    "lab_new_disk_limit": "2.5 GiB",
+    "minimum_free_disk_guard": "4 GiB"
+  },
+  "excluded": [
+    "new paid infrastructure",
+    "client or production service migration",
+    "HA cluster or heavy orchestration",
+    "public admin panels or credentials",
+    "enterprise-ready, compliance or unmeasured scale claims",
+    "Arealoom rendering or media-suite changes"
+  ]
+}
