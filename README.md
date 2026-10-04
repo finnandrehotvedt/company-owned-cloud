@@ -66,7 +66,7 @@ The canonical public mirrors are intended to carry the identical `main`
 commit:
 
 - GitHub: <https://github.com/finnandrehotvedt/company-owned-cloud>
-- GitLab: <https://gitlab.com/finnandrehotvedt/company-owned-cloud>
+- GitLab: <https://gitlab.finnandre.no/finnandrehotvedt/company-owned-cloud>
 
 Source written for this project is Apache-2.0. Third-party components retain
 their own licences; see [`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md).

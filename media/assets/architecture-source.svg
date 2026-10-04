@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Company-Owned Cloud Lab architecture</title>
+  <desc id="desc">Shared identity, target A export, encrypted backup and restore to target B.</desc>
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#eef1eb"/><stop offset="1" stop-color="#dfe8e1"/></linearGradient>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0 0l12 6-12 6z" fill="#2f6b50"/></marker>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <g font-family="Inter,Arial,sans-serif" fill="#15231c">
+    <text x="80" y="95" font-family="Georgia,serif" font-size="56" font-weight="700">A small, testable exit path</text>
+    <text x="82" y="140" font-size="23" fill="#53665c">Real OIDC · synthetic data · encrypted backup · measured A→B restore</text>
+  </g>
+  <g font-family="Inter,Arial,sans-serif">
+    <rect x="570" y="190" width="460" height="128" rx="24" fill="#173d2e"/>
+    <text x="800" y="240" text-anchor="middle" font-size="20" letter-spacing="2" fill="#91e3b7">SHARED LAB IDENTITY</text>
+    <text x="800" y="286" text-anchor="middle" font-size="32" font-weight="700" fill="#fff">Keycloak OIDC · roles · TOTP state</text>
+    <path d="M680 318L430 430M920 318l250 112" fill="none" stroke="#2f6b50" stroke-width="5" marker-end="url(#arrow)"/>
+    <rect x="95" y="410" width="530" height="270" rx="28" fill="#fff" stroke="#9bad9f" stroke-width="2"/>
+    <text x="135" y="462" font-size="18" letter-spacing="3" fill="#2f6b50">SOURCE · TARGET A</text>
+    <text x="135" y="518" font-size="36" font-weight="700" fill="#15231c">Protected notes app</text>
+    <rect x="135" y="555" width="215" height="78" rx="15" fill="#e7f3eb"/>
+    <text x="243" y="588" text-anchor="middle" font-size="18" fill="#53665c">PostgreSQL A</text>
+    <text x="243" y="617" text-anchor="middle" font-size="21" font-weight="700" fill="#173d2e">2 synthetic records</text>
+    <rect x="372" y="555" width="215" height="78" rx="15" fill="#f4efe3"/>
+    <text x="480" y="588" text-anchor="middle" font-size="18" fill="#53665c">Audit</text>
+    <text x="480" y="617" text-anchor="middle" font-size="21" font-weight="700" fill="#173d2e">Content-minimised</text>
+    <rect x="975" y="410" width="530" height="270" rx="28" fill="#fff" stroke="#9bad9f" stroke-width="2"/>
+    <text x="1015" y="462" font-size="18" letter-spacing="3" fill="#2f6b50">RESTORED · TARGET B</text>
+    <text x="1015" y="518" font-size="36" font-weight="700" fill="#15231c">Same protected app</text>
+    <rect x="1015" y="555" width="215" height="78" rx="15" fill="#e7f3eb"/>
+    <text x="1123" y="588" text-anchor="middle" font-size="18" fill="#53665c">PostgreSQL B</text>
+    <text x="1123" y="617" text-anchor="middle" font-size="21" font-weight="700" fill="#173d2e">2 restored records</text>
+    <rect x="1252" y="555" width="215" height="78" rx="15" fill="#e7f3eb"/>
+    <text x="1360" y="588" text-anchor="middle" font-size="18" fill="#53665c">Acceptance</text>
+    <text x="1360" y="617" text-anchor="middle" font-size="21" font-weight="700" fill="#173d2e">Exact hash match</text>
+    <rect x="665" y="475" width="270" height="138" rx="24" fill="#173d2e"/>
+    <text x="800" y="518" text-anchor="middle" font-size="18" letter-spacing="2" fill="#91e3b7">ENCRYPTED RESTIC</text>
+    <text x="800" y="560" text-anchor="middle" font-size="28" font-weight="700" fill="#fff">Checksum + check</text>
+    <text x="800" y="592" text-anchor="middle" font-size="18" fill="#c8d8cf">backup measured: 6.457 s</text>
+    <path d="M625 545h40M935 545h40" stroke="#2f6b50" stroke-width="6" marker-end="url(#arrow)"/>
+    <text x="800" y="755" text-anchor="middle" font-size="30" font-weight="700" fill="#173d2e">A stopped before B was accepted · complete exit 24.843 s</text>
+    <text x="800" y="805" text-anchor="middle" font-size="21" fill="#53665c">Small synthetic demo · identity exit not measured · final state stopped</text>
+  </g>
+</svg>

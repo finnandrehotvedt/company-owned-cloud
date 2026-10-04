@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Company-Owned Cloud Lab</title>
+  <desc id="desc">Open-source small measured demo with an exit path from target A to target B.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0d1713"/><stop offset="1" stop-color="#173d2e"/></linearGradient>
+    <filter id="shadow"><feDropShadow dx="0" dy="12" stdDeviation="16" flood-opacity=".3"/></filter>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="1090" cy="70" r="210" fill="#78d5a5" opacity=".08"/>
+  <path d="M0 520C250 440 380 610 650 520s390-45 550-10v120H0z" fill="#78d5a5" opacity=".07"/>
+  <g font-family="Inter,Arial,sans-serif" fill="#f6f1e7">
+    <text x="70" y="70" font-size="20" font-weight="700" letter-spacing="4" fill="#91e3b7">OPEN SOURCE · SMALL MEASURED DEMO</text>
+    <text x="70" y="165" font-family="Georgia,serif" font-size="74" font-weight="700">Own the source.</text>
+    <text x="70" y="245" font-family="Georgia,serif" font-size="74" font-weight="700">Prove the exit.</text>
+    <text x="72" y="300" font-size="25" fill="#c8d8cf">Identity · data · audit · encrypted backup · tested restore</text>
+  </g>
+  <g filter="url(#shadow)" font-family="Inter,Arial,sans-serif">
+    <rect x="70" y="360" width="275" height="140" rx="22" fill="#f8f4ea"/>
+    <text x="98" y="402" font-size="16" font-weight="700" letter-spacing="2" fill="#3b6b55">TARGET A</text>
+    <text x="98" y="458" font-size="34" font-weight="750" fill="#14251d">2 records</text>
+    <circle cx="315" cy="430" r="11" fill="#4ca879"/>
+    <path d="M356 430h120" stroke="#91e3b7" stroke-width="5" stroke-linecap="round"/>
+    <path d="m463 417 17 13-17 13" fill="none" stroke="#91e3b7" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="492" y="360" width="270" height="140" rx="22" fill="#f8f4ea"/>
+    <text x="520" y="402" font-size="16" font-weight="700" letter-spacing="2" fill="#3b6b55">TARGET B</text>
+    <text x="520" y="458" font-size="34" font-weight="750" fill="#14251d">2 records</text>
+    <circle cx="732" cy="430" r="11" fill="#4ca879"/>
+  </g>
+  <g font-family="Inter,Arial,sans-serif">
+    <rect x="820" y="350" width="310" height="166" rx="22" fill="#10231a" stroke="#48765f"/>
+    <text x="852" y="397" font-size="18" fill="#91e3b7">MEASURED EXIT</text>
+    <text x="852" y="451" font-size="46" font-weight="750" fill="#fff">24.843 s</text>
+    <text x="852" y="486" font-size="18" fill="#c8d8cf">Exact SHA-256 state match</text>
+    <text x="72" y="580" font-size="24" font-weight="700" fill="#f6f1e7">Company-Owned Cloud Lab</text>
+    <text x="1128" y="580" text-anchor="end" font-size="20" fill="#91e3b7">IntentForce</text>
+  </g>
+</svg>
