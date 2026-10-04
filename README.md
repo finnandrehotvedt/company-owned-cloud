@@ -55,6 +55,11 @@ data or a cloud account. Ordinary `scripts/labctl stop` retains volumes;
 - [`docs/SCALING.md`](docs/SCALING.md) — unmeasured production roadmap
 - [`docs/KNOWN-LIMITATIONS.md`](docs/KNOWN-LIMITATIONS.md) — what this does not prove
 - [`docs/OPERATOR-TRAINING.md`](docs/OPERATOR-TRAINING.md) — a short learning exercise
+- [`docs/ENTERPRISE-SOVEREIGN-CLOUD.md`](docs/ENTERPRISE-SOVEREIGN-CLOUD.md) — one integrated architecture framework for dedicated Linux servers, connected data centres, company applications, security, operations and exit
+- [`skills/enterprise-sovereign-cloud-architect/`](skills/enterprise-sovereign-cloud-architect/) — reusable agent skill for designing and reviewing that framework
+
+The enterprise framework is design guidance and a roadmap, not evidence that
+this small lab is production-ready or multi-data-centre tested.
 
 RFID cards, fingerprint smart cards/readers and similar physical technology
 are only examples of possible later upgrades. No card is ordered, included,

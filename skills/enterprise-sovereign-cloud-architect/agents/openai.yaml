@@ -1,0 +1,4 @@
+interface:
+  display_name: "Enterprise Sovereign Cloud Architect"
+  short_description: "Design secure, resilient company-controlled cloud platforms"
+  default_prompt: "Design a sovereign private-cloud architecture from business requirements, including failure, security, recovery, operations and migration boundaries."
